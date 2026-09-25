@@ -8,6 +8,7 @@ thickness = 3;
 spacing = 3;
 tokens = 3;
 eps = 0.01;
+case_or_token = "case";
 
 module rounded_star(x=50, y=50, z=5, points=5, rounding=1) {
     inner_ratio = 0.45;
@@ -56,26 +57,30 @@ module windows(){
     }    
 }
 
+// Draw everything
+if (case_or_token == "case"){
+    // Dookets
+    windows();
 
-// Dookets
-//windows();
+    // Back Panel
+    translate([0, (2 * token_width) + 5, token_depth * 2])
+        rotate([180, 0, 0])
+            difference(){
+                // Back panel
+                translate([0, 0, thickness + token_depth - inset])
+                    cube([(token_width * tokens) + (spacing * (tokens + 1)), token_width, thickness + inset]);
 
-// Back Panel
-//translate([0, (2 * token_width) + 5, token_depth * 2])
-//    rotate([180, 0, 0])
-//        difference(){
-//            // Back panel
-//            translate([0, 0, thickness + token_depth - inset])
-//                cube([(token_width * tokens) + (spacing * (tokens + 1)), token_width, thickness + inset]);
-//
-//            windows();
-//        }
-        
-// Tokens
-for(i = [0:tokens - 1]){
-    x_pos = i * ((spacing) + token_width);
-    //translate([x_pos + spacing, (2 * token_width) + 10, 0])
-    //    cube([token_width - inset, token_height, (token_depth - inset) / 2]);
-    translate([x_pos + spacing, (3 * token_width) + 25, 0])
-        cube([token_width - inset, token_height, (token_depth - inset) / 3]);
-}  
+                windows();
+            }
+            
+    // Tokens
+    for(i = [0:tokens - 1]){
+        x_pos = i * ((spacing) + token_width);
+        translate([x_pos + spacing, (2 * token_width) + 10, 0])
+            cube([token_width - inset, token_height, (token_depth - inset) / 2]);
+    } 
+}
+else {
+    cube([token_width - inset, token_height, (token_depth - inset) / 3]);
+}
+
