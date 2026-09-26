@@ -1,1 +1,3 @@
 *.stl
+*.png
+__pycache__/
