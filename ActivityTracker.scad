@@ -1,17 +1,9 @@
 // ---------------------------------------------------------------------------
 //  Star Activity Tracker
 //
-//  A row of recessed token windows, each with a star-shaped cut-out through
-//  its floor, plus a rear panel and the tokens themselves. A window shows its
-//  star when empty; seating a token in it covers the star.
-//
 //  Model page: https://www.printables.com/model/1854921-star-activity-tracker
 //
 //  All dimensions are in millimetres.
-//
-//  Render targets (see Makefile):
-//      -D 'case_or_token="case"'  -D "tokens=N"   one display case, N windows
-//      -D 'case_or_token="token"'                 a single printable token
 //
 // ---------------------------------------------------------------------------
 
@@ -19,8 +11,6 @@
 //  Quality
 // ---------------------------------------------------------------------------
 
-// Fixed fragment count. It shapes the star's rounded corners, so changing it
-// alters the rendered mesh, not just preview smoothness.
 $fn = 50;
 
 // ---------------------------------------------------------------------------
@@ -39,7 +29,7 @@ spacing = 3;        // gap between windows, also the width of a window's frame w
 tokens = 3;         // number of windows in the case
 
 // Layout
-eps = 0.01;         // fudge factor for clean boolean cuts
+eps = 0.01;          // fudge factor for clean boolean cuts
 panel_clearance = 5; // gap between the window row and the rear panel
 case_or_token = "case";
 
@@ -59,10 +49,7 @@ case_length = tokens * column_pitch + spacing; // window row and panel width
 //  Star
 // ---------------------------------------------------------------------------
 
-// An n-pointed star with rounded corners, extruded to height z. The outline
-// is shrunk by the corner radius and grown back out, which rounds every
-// corner. inner_ratio sets how far the inner vertices sit from the outer
-// ones: 0 gives sharp spikes, 1 collapses the star into a circle.
+// An n-pointed star with rounded corners, extruded to height z
 module rounded_star(x = 50, y = 50, z = 5, points = 5, rounding = 1, inner_ratio = 0.45) {
     linear_extrude(height = z)
         offset(r = rounding)
@@ -84,10 +71,6 @@ module rounded_star(x = 50, y = 50, z = 5, points = 5, rounding = 1, inner_ratio
 //  Token window
 // ---------------------------------------------------------------------------
 
-// One open-backed, open-topped tray sized to a token, with a star-shaped
-// cut-out through its floor. The frame walls are `spacing` wide, the floor is
-// `thickness` thick, and the cavity deliberately overshoots the back face so
-// the window opens cleanly.
 module window(x_offset) {
     translate([x_offset, 0, 0])
         difference() {
@@ -113,8 +96,7 @@ module windows() {
 
 // A flat panel sitting `panel_clearance` behind the window row. The token
 // windows are subtracted from it, leaving shallow notches on its inner face
-// where the window frames land. It is rotated about x and offset by twice
-// the token depth so it lies flat on the build plate.
+// where the window frames land.
 module rear_panel() {
     translate([0, 2 * token_width + panel_clearance, 2 * token_depth])
         rotate([180, 0, 0])
@@ -130,17 +112,13 @@ module rear_panel() {
 //  Tokens
 // ---------------------------------------------------------------------------
 
-// Tokens displayed behind the case in the preview render. These are thicker
-// than the printable token below.
-module preview_tokens() {
+module blank_tokens() {
     for (i = [0 : tokens - 1])
         translate([i * column_pitch + spacing, 2 * token_width + 2 * panel_clearance, 0])
             cube([token_width - inset, token_height, (token_depth - inset) / 2]);
 }
 
-// The printable token: a plain slab. The star motif comes from the cut-out
-// in the window floor, not from the token itself.
-module token() {
+module highlighted_token() {
     cube([token_width - inset, token_height, (token_depth - inset) / 3]);
 }
 
@@ -157,8 +135,8 @@ assert(
 if (case_or_token == "case") {
     windows();
     rear_panel();
-    preview_tokens();
+    blank_tokens();
 } else {
-    token();
+    highlighted_token();
 }
 
